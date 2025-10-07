@@ -28,6 +28,7 @@ or refine codes. The codes I have directly copied has comment with it.
 
 # Importing statements and libraries
 import os
+import time
 import pandas as pd
 import numpy as np
 import yfinance as yf
@@ -35,12 +36,20 @@ from urllib.request import Request, urlopen # Need for data scraping
 from pathlib import Path
 from src.step1_bootstrap import main as bootstrap_main  # Import bootstrap
 
-# Path safety to make the script reproducible. 
+# Declaring constants
+USER_AGENT = "Mozilla/5.0"
+WIKI_URL = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+CSV_TICKERS = "data/raw/sp500_tickers.csv"
+CSV_WEIGHTS = "data/processed/weights_latest.csv"
+PROGRESS_EVERY = 25       # helps to get 25 company update
+REQUEST_TIMEOUT = 30      # in seconds
+
+# Path safety to make the script reproducible.
 # This code block is copied from ChatGPT.
 try:
     THIS_FILE = Path(__file__).resolve()
-    ROOT = (THIS_FILE.parent.parent if THIS_FILE
-            .parent.name == "src" else THIS_FILE.parent)
+    ROOT = (THIS_FILE.parent.parent if 
+            THIS_FILE.parent.name == "src" else THIS_FILE.parent)
 except NameError:
     ROOT = Path(os.getcwd())
 os.chdir(ROOT)
@@ -53,16 +62,16 @@ def sp500_from_wikipedia(csv_path: str):
     Pull current S&P 500 tickers by scraping Wikipedia, clean them to Yahoo 
     style, and save to CSV at csv_path.
     """
-    url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
     try:
         # use a browsery User-Agent for avoiding website block
-        req = Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        html = urlopen(req, timeout=30).read()
-        tables = pd.read_html(html, flavor="html5lib")  # html5lib installed
+        req = Request(WIKI_URL, headers={"User-Agent": USER_AGENT})
+        html = urlopen(req, timeout=REQUEST_TIMEOUT).read()
+        # NOTE: requires html5lib
+        tables = pd.read_html(html, flavor="html5lib")
     except ImportError:
-        raise SystemExit("install html5lib")
+        raise SystemExit("Missing dependency: pip install html5lib")
     except Exception as e:
-        raise SystemExit(f"Could not download S&P 500 table. : {e}")
+        raise SystemExit(f"Could not download S&P 500 tickers: {e}")
 
     df = tables[0]                  # first table contains the constituents
     tickers = df["Symbol"].tolist() # column name is 'Symbol'
@@ -103,18 +112,20 @@ def load_or_refresh_sp500(csv_path: str) -> pd.DataFrame:
     
     # After ensuring refresh clean the data frame
     df = pd.read_csv(csv_path)
-    df["ticker"] = (df["ticker"] 
-                            .astype(str) # converting to string
-                            .str.strip() # removing blank space
-                            .str.upper() # making the words capitalized
-                            .str.replace(".", "-", regex=False) # Replacing . to -
-                            )
+    df["ticker"] = (
+        df["ticker"] 
+        .astype(str) # converting to string
+        .str.strip() # removing blank space
+        .str.upper() # making the words capitalized
+        .str.replace(".", "-", regex=False) # Replacing . to -
+    )
+
     df = (
-        df.loc[df["ticker"] != ""]          # remove blank rows
-                  .drop_duplicates()        # remove duplicates
-                  .sort_values("ticker")    # sort alphabetically
-                  .reset_index(drop=True)
-                )
+        df.loc[df["ticker"] != ""]  # remove blank rows
+        .drop_duplicates()          # remove duplicates
+        .sort_values("ticker")      # sort alphabetically
+        .reset_index(drop=True)
+    )
     return df 
 
 def main():
@@ -123,16 +134,12 @@ def main():
     # Bootsraping to be safe
     bootstrap_main()
 
-    # Fixing file path
-    tickers_path = "data/raw/sp500_tickers.csv"
-    out_path = "data/processed/weights_latest.csv"
-
     # Skip Weight calculation if done previously
-    if os.path.exists(out_path):
+    if os.path.exists(CSV_WEIGHTS):
         try:
             df_existing = pd.read_csv(out_path)
             if not df_existing.empty and "w_latest" in df_existing.columns:
-                print(f"[info] {out_path} already exists — skipping recalculation.")
+                print(f"[info] {CSV_WEIGHTS} already exists — skipping recalculation.")
                 print(f"  Total rows: {len(df_existing)}")
                 print(f"  Sum of weights: {df_existing['w_latest'].sum():.6f}")
                 return
@@ -140,27 +147,34 @@ def main():
             pass 
 
     # 1) Load tickers
-    df_tickers = load_or_refresh_sp500(tickers_path)
+    df_tickers = load_or_refresh_sp500(CSV_TICKERS)
     tickers = df_tickers["ticker"].tolist()   # converting to python list
-    print(f"next step may look stuck but it is pulling data of each stock")
     print(f"[info] tickers to fetch: {len(tickers)}") # show the number of ticker
 
     # 2) Fetch share price and volume to calculate market capitalization
     stock_prcs = []
     for i, t in enumerate(tickers, start=1):
-        if i % 25 == 0:
-        print(f"[info] fetched ~{i}/{len(tickers)} tickers...")
         try:
             info = yf.Ticker(t).info
-            shares = info.get("sharesOutstanding", None)
-            price  = info.get("currentPrice", None)
+            shares = info.get("sharesOutstanding")
+            price  = info.get("currentPrice")
+            if price is None:
+                try:
+                    price = tk.fast_info.get("last_price")
+                except Exception:
+                    price = None
             if not shares or not price or shares <= 0 or price <= 0:
                 print(f"[skip] {t}: missing/invalid shares or price")
-                continue
-            cap = float(shares) * float(price)
-            stock_prcs.append((t, int(shares), float(price), float(cap)))
+            else:
+                cap = float(shares) * float(price)
+                stock_prcs.append((t, int(shares), float(price), float(cap)))
         except Exception as e:
             print(f"[skip] {t}: {e}")
+
+        # Minor stock data pull update
+        if i % PROGRESS_EVERY == 0:
+            print(f"[info] fetched ~{i}/{len(tickers)} tickers...")
+            
     if not stock_prcs:
         raise SystemExit("Check connection or yfinance.")
 
@@ -180,16 +194,15 @@ def main():
     out_path = "data/processed/weights_latest.csv"
     # Sorting by stock weight. Drop old index
     dfw = dfw.sort_values("w_latest", ascending=False).reset_index(drop=True)
-    dfw.to_csv(out_path, index=False)
+    dfw.to_csv(CSV_WEIGHTS, index=False)
     
     # print summary
-    total_rows = len(dfw)
-    big_count = (dfw["bucket"] == "Big").sum()
-    sum_weights = dfw["w_latest"].sum()
-    print(f"[write] {out_path}")
-    print(f"  Total rows: {total_rows}")
-    print(f"  Big firms: {big_count}")
-    print(f"  Sum of weights: {sum_weights:.6f}")
+    print(f"[write] {CSV_WEIGHTS}")
+    print(f"  Total rows: {len(dfw)}")
+    print(f"  Big firms: {(dfw['bucket'] == 'Big').sum()}")
+    print(f"  Small firms: {(dfw['bucket'] == 'Small').sum()}")
+    print(f"  Sum of weights: {dfw['w_latest'].sum():.6f}")
+    print("=== Step 2 Complete ===")
 
 if __name__ == "__main__":
     main()
