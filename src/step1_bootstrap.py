@@ -20,21 +20,29 @@ attempted to code first and used ChatGPT's input to fix them.
 
 # Importing statements and third-party libraries
 import os
+import sys
 import pandas as pd
 from pathlib import Path
 
 # Path safety to make the script reproducible. #
 # This code block is from ChatGPT.
-try:
-    THIS_FILE = Path(__file__).resolve()
-    if THIS_FILE.parent.name == "src":
-        ROOT = THIS_FILE.parent.parent
-    else:
-        ROOT = THIS_FILE.parent
-except NameError:
-    # Fallback if __file__ doesn't exist (e.g., in Jupyter)
-    ROOT = Path(os.getcwd())
+def _detect_project_root() -> Path:
+    # If running as a script, prefer __file__
+    if "__file__" in globals():
+        here = Path(__file__).resolve()
+        return here.parent.parent if here.parent.name == "src" else here.parent
+    # If running interactively, walk upward until we find a folder that has src/
+    p = Path.cwd().resolve()
+    for _ in range(8):
+        if (p / "src").exists():
+            return p
+        p = p.parent
+    # Fallback (last resort)
+    return Path.cwd().resolve()
 
+ROOT = _detect_project_root()
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 os.chdir(ROOT)
 print(f"[info] Working directory set to: {ROOT}")
 
@@ -60,7 +68,6 @@ def main():
         "data/raw/ohlcv",
         "data/raw/earnings", 
         "data/processed",
-        "reports"
     ]
 
     # 2. Create folders if they don't exist
