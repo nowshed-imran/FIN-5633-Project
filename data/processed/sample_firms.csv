@@ -1,0 +1,57 @@
+ticker,w_latest,bucket,sector
+NVDA,0.0753714219703291,Big,Information Technology
+AAPL,0.0648254260292581,Big,Information Technology
+MSFT,0.0646872717938725,Big,Information Technology
+AMZN,0.039742383824064,Big,Consumer Discretionary
+AVGO,0.0277948239332406,Big,Information Technology
+META,0.0266171685661472,Big,Communication Services
+GOOGL,0.0251293014759823,Big,Communication Services
+TSLA,0.0239745097660003,Big,Consumer Discretionary
+GOOG,0.0235107174897583,Big,Communication Services
+WMT,0.014068802285036,Big,Consumer Staples
+JPM,0.0135931289688333,Big,Financials
+ORCL,0.013424553179672,Big,Information Technology
+LLY,0.0122987726199725,Big,Health Care
+BRK-B,0.0112749900735284,Big,Financials
+T,0.0029704034595944,Small,Communication Services
+FOXA,0.0002077658145247,Small,Communication Services
+FOX,0.0002071274380957,Small,Communication Services
+CMG,0.0009179625821594,Small,Consumer Discretionary
+POOL,0.000182195641362,Small,Consumer Discretionary
+LOW,0.0022623334463277,Small,Consumer Discretionary
+STZ,0.0004061256610695,Small,Consumer Staples
+ADM,0.0005057226810665,Small,Consumer Staples
+MO,0.0018056168820373,Small,Consumer Staples
+OXY,0.0006965213651744,Small,Energy
+CTRA,0.0002987010626873,Small,Energy
+XOM,0.0081761777616919,Small,Energy
+PNC,0.0012158761025782,Small,Financials
+COF,0.0023773640195534,Small,Financials
+BK,0.001251628311154,Small,Financials
+ELV,0.0012645377469673,Small,Health Care
+WST,0.0003556934425979,Small,Health Care
+ABBV,0.006693995500263,Small,Health Care
+NDSN,0.0002202926728116,Small,Industrials
+HON,0.0022807273911021,Small,Industrials
+BR,0.0004506267756757,Small,Industrials
+LRCX,0.0031743617094676,Small,Information Technology
+APH,0.0027155029767542,Small,Information Technology
+TRMB,0.0003220277575593,Small,Information Technology
+MLM,0.0006226652364592,Small,Materials
+SW,0.0003737584767124,Small,Materials
+ECL,0.001306851538768,Small,Materials
+CSGP,0.0005484422957893,Small,Real Estate
+PSA,0.0008813613816422,Small,Real Estate
+REG,0.0002191904714291,Small,Real Estate
+CEG,0.0020207943002122,Small,Utilities
+ATO,0.0004693754488134,Small,Utilities
+AES,0.0001721927542232,Small,Utilities
+TTWO,0.0007821902669206,Small,Communication Services
+YUM,0.0006612847321839,Small,Consumer Discretionary
+BG,0.0003251959695961,Small,Consumer Staples
+TPL,0.0003546690062616,Small,Energy
+AIG,0.0007274137876747,Small,Financials
+BSX,0.0024900678422749,Small,Health Care
+HWM,0.0013300415243935,Small,Industrials
+HPE,0.0005153502304651,Small,Information Technology
+PKG,0.0003063199865824,Small,Materials
