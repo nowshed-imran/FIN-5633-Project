@@ -1,0 +1,92 @@
+ticker,w_latest,bucket,sector
+NVDA,0.0746468478953716,Big,Information Technology
+AAPL,0.0687583310661064,Big,Information Technology
+MSFT,0.060142904669935,Big,Information Technology
+AMZN,0.0404364822260958,Big,Consumer Discretionary
+GOOGL,0.0298817978675046,Big,Communication Services
+GOOG,0.0277699362775606,Big,Communication Services
+AVGO,0.0275358250903455,Big,Information Technology
+TSLA,0.0222935676722638,Big,Consumer Discretionary
+META,0.0221824349701768,Big,Communication Services
+LLY,0.016256210073767,Big,Health Care
+WMT,0.014392251400457,Big,Consumer Staples
+JPM,0.0139052758882466,Big,Financials
+BRK-B,0.0118599504900002,Big,Financials
+LYV,0.0005199082016792,Small,Communication Services
+TTWO,0.000745747889505,Small,Communication Services
+IPG,0.000160167806626,Small,Communication Services
+VZ,0.0029796276548256,Small,Communication Services
+OMC,0.0002476466202645,Small,Communication Services
+TKO,0.0002410121217168,Small,Communication Services
+TMUS,0.0040159228225363,Small,Communication Services
+ULTA,0.0003962324611667,Small,Consumer Discretionary
+LULU,0.0003270787230777,Small,Consumer Discretionary
+CCL,0.0005315014588929,Small,Consumer Discretionary
+AZO,0.0011112057617795,Small,Consumer Discretionary
+HAS,0.0001905029357124,Small,Consumer Discretionary
+BKNG,0.0026342208770251,Small,Consumer Discretionary
+MAR,0.001360710167773,Small,Consumer Discretionary
+MO,0.0016742423352646,Small,Consumer Staples
+DG,0.0003836693631126,Small,Consumer Staples
+CPB,0.0001615468263497,Small,Consumer Staples
+CLX,0.0002172667900565,Small,Consumer Staples
+SJM,0.0001929857910008,Small,Consumer Staples
+KO,0.0053784909757635,Small,Consumer Staples
+TAP,0.000146443396373,Small,Consumer Staples
+VLO,0.0009067591728587,Small,Energy
+PSX,0.0009234654426127,Small,Energy
+HAL,0.0003724602477256,Small,Energy
+KMI,0.0010287963637865,Small,Energy
+CVX,0.0051395747781267,Small,Energy
+DVN,0.000383300206575,Small,Energy
+CTRA,0.000336032693547,Small,Energy
+NDAQ,0.0008579032884646,Small,Financials
+AIG,0.0007024927643787,Small,Financials
+RJF,0.0005194595700863,Small,Financials
+JKHY,0.000211881709282,Small,Financials
+TFC,0.0009971921725639,Small,Financials
+BK,0.0012720920937605,Small,Financials
+WFC,0.0044715750699643,Small,Financials
+DXCM,0.0004026241505008,Small,Health Care
+BSX,0.0024615920685168,Small,Health Care
+LH,0.0003774437459279,Small,Health Care
+VRTX,0.0018558404644522,Small,Health Care
+GEHC,0.0005968850329157,Small,Health Care
+SYK,0.0024138779820745,Small,Health Care
+DGX,0.0003646497138037,Small,Health Care
+FDX,0.0010896329205342,Small,Industrials
+TXT,0.0002456519502672,Small,Industrials
+GWW,0.000775986327202,Small,Industrials
+TT,0.0015586051012083,Small,Industrials
+LHX,0.0008905730073648,Small,Industrials
+GE,0.005196695671722,Small,Industrials
+J,0.0002638270675571,Small,Industrials
+NOW,0.0028927027659104,Small,Information Technology
+SWKS,0.0001595511016484,Small,Information Technology
+DDOG,0.0008788162353566,Small,Information Technology
+EPAM,0.0001713598476947,Small,Information Technology
+QCOM,0.0029976428429237,Small,Information Technology
+KLAC,0.0024707477256498,Small,Information Technology
+INTU,0.0031689585856856,Small,Information Technology
+CF,0.0002099660758483,Small,Materials
+PKG,0.0003042882345255,Small,Materials
+SHW,0.0014321107677341,Small,Materials
+AMCR,0.0003362998598368,Small,Materials
+STLD,0.0003958744049404,Small,Materials
+DOW,0.0002704485774584,Small,Materials
+IP,0.0003409300561157,Small,Materials
+AMT,0.0014407735374621,Small,Real Estate
+VTR,0.0006379690458474,Small,Real Estate
+CPT,0.0001918961969764,Small,Real Estate
+ESS,0.0002883303730522,Small,Real Estate
+IRM,0.000430739125382,Small,Real Estate
+FRT,0.0001448629395834,Small,Real Estate
+EQIX,0.0012700387885109,Small,Real Estate
+WEC,0.0006196565052329,Small,Utilities
+DTE,0.0004832913512378,Small,Utilities
+EVRG,0.0002992897332648,Small,Utilities
+NRG,0.0005229162229431,Small,Utilities
+ATO,0.0004854352275401,Small,Utilities
+ES,0.000415098097631,Small,Utilities
+PPL,0.0004579632123303,Small,Utilities
+EA,0.0008578954365954,Small,Communication Services

@@ -158,7 +158,6 @@ EIX,Utilities
 EL,Consumer Staples
 ELV,Health Care
 EME,Industrials
-EMN,Materials
 EMR,Industrials
 EOG,Energy
 EPAM,Information Technology
@@ -185,9 +184,9 @@ FDS,Financials
 FDX,Industrials
 FE,Utilities
 FFIV,Information Technology
-FI,Financials
 FICO,Information Technology
 FIS,Financials
+FISV,Financials
 FITB,Financials
 FOX,Communication Services
 FOXA,Communication Services
@@ -270,7 +269,6 @@ KKR,Financials
 KLAC,Information Technology
 KMB,Consumer Staples
 KMI,Energy
-KMX,Consumer Discretionary
 KO,Consumer Staples
 KR,Consumer Staples
 KVUE,Consumer Staples
@@ -387,6 +385,7 @@ PSX,Energy
 PTC,Information Technology
 PWR,Industrials
 PYPL,Financials
+Q,Information Technology
 QCOM,Information Technology
 RCL,Consumer Discretionary
 REG,Real Estate
@@ -412,6 +411,7 @@ SMCI,Information Technology
 SNA,Industrials
 SNPS,Information Technology
 SO,Utilities
+SOLS,Materials
 SOLV,Health Care
 SPG,Real Estate
 SPGI,Financials

@@ -90,7 +90,7 @@ def sp500_from_wikipedia(csv_path: str) -> None:
     except Exception as e:
         raise SystemExit(f"Could not download S&P 500 tickers: {e}")
 
-    df = tables[0]                  # first table contains the constituents
+    df = next(t for t in tables if 'Symbol' in t.columns)      # find the table contains the constituents
     # Pulling ticker and sector data
     out = pd.DataFrame({
         "ticker": (df["Symbol"].astype(str)

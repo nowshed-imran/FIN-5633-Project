@@ -1,0 +1,40 @@
+ticker,w_latest,bucket,sector
+NVDA,0.0746468478953716,Big,Information Technology
+AAPL,0.0687583310661064,Big,Information Technology
+MSFT,0.060142904669935,Big,Information Technology
+AMZN,0.0404364822260958,Big,Consumer Discretionary
+GOOGL,0.0298817978675046,Big,Communication Services
+GOOG,0.0277699362775606,Big,Communication Services
+AVGO,0.0275358250903455,Big,Information Technology
+TSLA,0.0222935676722638,Big,Consumer Discretionary
+META,0.0221824349701768,Big,Communication Services
+LLY,0.016256210073767,Big,Health Care
+WMT,0.014392251400457,Big,Consumer Staples
+JPM,0.0139052758882466,Big,Financials
+BRK-B,0.0118599504900002,Big,Financials
+IPG,0.000160167806626,Small,Communication Services
+DIS,0.0031909040536844,Small,Communication Services
+RCL,0.0012344172569471,Small,Consumer Discretionary
+CCL,0.0005315014588929,Small,Consumer Discretionary
+TGT,0.0006824093816827,Small,Consumer Staples
+K,0.0004976519741727,Small,Consumer Staples
+TRGP,0.0006274494023551,Small,Energy
+VLO,0.0009067591728587,Small,Energy
+AIZ,0.0001946971183549,Small,Financials
+SCHW,0.0027565937729019,Small,Financials
+PODD,0.0003993007917178,Small,Health Care
+CNC,0.000307493912853,Small,Health Care
+CHRW,0.0003071278107308,Small,Industrials
+LII,0.0002796014773763,Small,Industrials
+NXPI,0.0008254140604877,Small,Information Technology
+PANW,0.0021441889348185,Small,Information Technology
+CTVA,0.0007590758149594,Small,Materials
+SHW,0.0014321107677341,Small,Materials
+VICI,0.0005279578767775,Small,Real Estate
+CPT,0.0001918961969764,Small,Real Estate
+PNW,0.0001828878665907,Small,Utilities
+CEG,0.0018097577131138,Small,Utilities
+LYV,0.0005199082016792,Small,Communication Services
+HAS,0.0001905029357124,Small,Consumer Discretionary
+EL,0.0003788255406389,Small,Consumer Staples
+COP,0.0018504869555077,Small,Energy

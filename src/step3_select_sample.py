@@ -70,14 +70,19 @@ CSV_SAMPLE  = ROOT / "data" / "processed" / "sample_firms.csv"
 DIR_OHLCV   = ROOT / "data" / "raw" / "ohlcv"
 DIR_EARN    = ROOT / "data" / "raw" / "earnings"
 
-INDEX_TIC = "^GSPC"         # S&P 500 Index
-SAMPLE_LEN = "1y"           # 1 year data history for now will be incresed later
-SEED = 5633                 # Random seed for reproducibility
+INDEX_TIC = "^GSPC"            # S&P 500 Index
+YEARS = 20                     # 20 years of data to train model
+SAMPLE_LEN = f"{YEARS}y"       # To dowload S&P 500 Data
+SEED = 5633                    # Random seed for reproducibility
 
 ### User Override
-BIG_OVERRIDE = None      # Upto 14 is allowed
-SMALL_MULTIPLIER = 3     # Small = SMALL_MULTIPLIER × Big (max 20)
-EARNINGS_LIMIT = 12      # Number of quarters information to download
+BIG_OVERRIDE = None             # Upto 14 is allowed
+SMALL_MULTIPLIER = 3            # Small = SMALL_MULTIPLIER × Big (max 20)
+EARNINGS_LIMIT = YEARS * 4      # Four Earning Call each year
+
+# Modifying how many multiple of big companies to keep for logistic regression training
+MAX_MULTIPLIER = 20   # change to anything 1–20
+MAX_MULTIPLIER = min(max(1, int(MAX_MULTIPLIER)), 20)
 
 # Make sure folders exist for outputs
 DIR_OHLCV.mkdir(parents=True, exist_ok=True)
@@ -115,142 +120,203 @@ else:
     n_big = len(big_df)
     print(f"[info] Big: OVERRIDE to {n_big} random firms")
 
-### Step 3: Select Small firms by sector
-small_pool = dfw[(dfw["bucket"] == "Small") & dfw["sector"].notna()].copy()
-small_pool["sector"] = small_pool["sector"].astype(str).replace("", "NA")
+### Step 3: Select Small firms by sector and based on multiples
+# MAIN LOOP: repeat Step 3–5 for SMALL_MULTIPLIER = 1,...,10. Upto 20 can be done.
+for SMALL_MULTIPLIER in range(1, MAX_MULTIPLIER + 1):
+    print("\n" + "=" * 50)
+    print(f"[info] SMALL_MULTIPLIER = {SMALL_MULTIPLIER}")
+    print("=" * 50)
+    # select small firm by sector
+    small_pool = dfw[(dfw["bucket"] == "Small") & dfw["sector"].notna()].copy()
+    small_pool["sector"] = small_pool["sector"].astype(str).replace("", "NA")
+    print("[info] Step 3 started for multiplier", SMALL_MULTIPLIER)
 
-# Calculate how many Small firm to pick
-n_small_target = min(SMALL_MULTIPLIER * n_big, len(small_pool))
-print(f"[info] Small target = {SMALL_MULTIPLIER} * {n_big} = {SMALL_MULTIPLIER*n_big} "
-      f"(capped at available: {n_small_target})")
+    # Calculate how many Small firm to pick
+    n_small_target = min(SMALL_MULTIPLIER * n_big, len(small_pool))
+    print(f"[info] Small target = {SMALL_MULTIPLIER} * {n_big} = {SMALL_MULTIPLIER*n_big} "
+        f"(capped at available: {n_small_target})")
 
-if n_small_target == 0:
-    small_df = small_pool.head(0).copy()
-else:
-    # Figure out how many sectors in the S&P 500. 
-    sectors = sorted(small_pool["sector"].unique().tolist())
-    k = len(sectors)
+    if n_small_target == 0:
+        small_df = small_pool.head(0).copy()
+    else:
+        # Figure out how many sectors in the S&P 500. 
+        sectors = sorted(small_pool["sector"].unique().tolist())
+        k = len(sectors)
 
-    # Compute equal companies for each sector (x) and remainder (y)
-    x = (n_small_target // k) if k > 0 else 0
-    y = n_small_target - (k * x) if k > 0 else 0
-    print(f"[info] Equal-per-sector x = {x}, remainder y = {y}, sectors = {k}")
+        # Compute equal companies for each sector (x) and remainder (y)
+        x = (n_small_target // k) if k > 0 else 0
+        y = n_small_target - (k * x) if k > 0 else 0
+        print(f"[info] Equal-per-sector x = {x}, remainder y = {y}, sectors = {k}")
 
-    picked_list = []
-    # Store remaining companies so that they are not picked again
-    leftover = {}
+        picked_list = []
+        # Store remaining companies so that they are not picked again
+        leftover = {}
 
-    # Selecting equal number of comapnies  from each sector. ChatGPT helped here.
-    for s in sectors:
-        grp = small_pool[small_pool["sector"] == s]
-        take = min(x, len(grp))
-        if take > 0:
-            first_take = grp.sample(n=take,
-                                    random_state=int(rng.integers(0, 2**32 - 1)))
-            picked_list.append(first_take)
-            # remove picked from this sector to form a leftover pool
-            remaining = grp.loc[~grp["ticker"].isin(first_take["ticker"])]
-        else:
-            first_take = grp.head(0)
-            remaining = grp  # nothing picked yet
-        leftover[s] = remaining
-
-    # Combine all equal selections
-    picked = (pd.concat(picked_list, axis=0).reset_index(drop=True)
-              if picked_list else small_pool.head(0).copy())
-    
-    # Pick y extra stocks from sectors that still have capacity. ChatGPT helped here.
-    rem = y
-    while rem > 0:
-        progressed = False
+        # Selecting equal number of comapnies  from each sector. ChatGPT helped here.
         for s in sectors:
-            if rem <= 0:
-                break
-            pool_s = leftover.get(s, small_pool.head(0))
-            if not pool_s.empty:
-                # take 1 from this sector
-                one = pool_s.sample(n=1,
-                                    random_state=int(rng.integers(0, 2**32 - 1)))
-                picked = pd.concat([picked, one], axis=0, ignore_index=True)
-                # update leftover (remove the selected stocks)
-                pool_s = pool_s.loc[~pool_s["ticker"].isin(one["ticker"])]
-                leftover[s] = pool_s
-                rem -= 1
-                progressed = True
-        if not progressed:
-            # no sector had remaining capacity
-            break
-
-    small_df = picked.reset_index(drop=True)
-
-### Step 4: Save sample firms and print summary
-keep_cols = ["ticker", "w_latest", "bucket", "sector"]
-sample_df = pd.concat([big_df[keep_cols], small_df[keep_cols]],
-                      axis=0).reset_index(drop=True)
-
-# Writng the output to CSV
-sample_df.to_csv(CSV_SAMPLE, index=False)
-print(f"[write] {CSV_SAMPLE}  (rows={len(sample_df)}, "
-      f"Big={len(big_df)}, Small={len(small_df)})")
-
-### Step 5: Download 1-year OHLCV and earnings data
-# Download ^GSPC index. This block of code is from ChatGPT.
-idx_hist = yf.Ticker(INDEX_TIC).history(SAMPLE_LEN)
-if not idx_hist.empty:
-    (idx_hist.reset_index()
-             .rename(columns=str.title)
-             .to_csv(DIR_OHLCV / f"{INDEX_TIC}.csv", index=False))
-    print(f"[write] OHLCV: {INDEX_TIC}.csv ({len(idx_hist)})")
-else:
-    print(f"[warn] Empty index data for {INDEX_TIC}")
-
-# Download data for all selected firms. ChatGPT helped here a lot. Still couldn't
-# figure out to check for existing data and skiping if correct information is 
-# already available.
-for tic in sample_df["ticker"]:
-    # OHLCV (always re-download & overwrite)
-    try:
-        prc = yf.Ticker(tic).history(SAMPLE_LEN)
-        if not prc.empty:
-            (prc.reset_index()
-                .rename(columns=str.title)
-                .to_csv(DIR_OHLCV / f"{tic}.csv", index=False))
-            print(f"[write] OHLCV: {tic}.csv ({len(prc)})")
-        else:
-            print(f"[warn] Empty OHLCV for {tic}")
-    except Exception as e:
-        print(f"[error] OHLCV {tic}: {e}")
-
-    # Earning (quarterly with timestamp ONLY)
-    try:
-        tk = yf.Ticker(tic)
-        earn_q = tk.get_earnings_dates(limit=EARNINGS_LIMIT)
-
-        if isinstance(earn_q, pd.DataFrame) and not earn_q.empty:
-            earn_q = earn_q.reset_index()
-            if "index" in earn_q.columns:
-                earn_q = earn_q.rename(columns={"index": "EarningsDate"})
-            elif "Earnings Date" in earn_q.columns:
-                earn_q = earn_q.rename(columns={"Earnings Date": "EarningsDate"})
-
-            # enforce timestamp and keep only needed columns
-            if "EarningsDate" in earn_q.columns:
-                earn_q["EarningsDate"] = pd.to_datetime(earn_q["EarningsDate"], errors="coerce")
-                earn_q = earn_q.dropna(subset=["EarningsDate"])
-                keep = [c for c in ["EarningsDate","EPS Estimate","Reported EPS","Surprise(%)","Quarter"]
-                        if c in earn_q.columns]
-                earn_q = earn_q[keep]
-                if not earn_q.empty:
-                    earn_q.to_csv(DIR_EARN / f"{tic}.csv", index=False)
-                    print(f"[write] Earnings (quarterly): {tic}.csv ({len(earn_q)})")
-                else:
-                    print(f"[warn] Skipping earnings for {tic}: required columns missing after cleaning.")
+            grp = small_pool[small_pool["sector"] == s]
+            take = min(x, len(grp))
+            if take > 0:
+                first_take = grp.sample(n=take,
+                                        random_state=int(rng.integers(0, 2**32 - 1)))
+                picked_list.append(first_take)
+                # remove picked from this sector to form a leftover pool
+                remaining = grp.loc[~grp["ticker"].isin(first_take["ticker"])]
             else:
-                print(f"[warn] Skipping earnings for {tic}: no timestamp column in get_earnings_dates().")
+                first_take = grp.head(0)
+                remaining = grp  # nothing picked yet
+            leftover[s] = remaining
+
+        # Combine all equal selections
+        picked = (pd.concat(picked_list, axis=0).reset_index(drop=True)
+                if picked_list else small_pool.head(0).copy())
+        
+        # Pick y extra stocks from sectors that still have capacity. ChatGPT helped here.
+        rem = y
+        while rem > 0:
+            progressed = False
+            for s in sectors:
+                if rem <= 0:
+                    break
+                pool_s = leftover.get(s, small_pool.head(0))
+                if not pool_s.empty:
+                    # take 1 from this sector
+                    one = pool_s.sample(n=1,
+                                        random_state=int(rng.integers(0, 2**32 - 1)))
+                    picked = pd.concat([picked, one], axis=0, ignore_index=True)
+                    # update leftover (remove the selected stocks)
+                    pool_s = pool_s.loc[~pool_s["ticker"].isin(one["ticker"])]
+                    leftover[s] = pool_s
+                    rem -= 1
+                    progressed = True
+            if not progressed:
+                # no sector had remaining capacity
+                break
+
+        small_df = picked.reset_index(drop=True)
+
+    
+
+    ### Save sample firms and print summary
+    keep_cols = ["ticker", "w_latest", "bucket", "sector"]
+    sample_df = pd.concat([big_df[keep_cols], small_df[keep_cols]],
+                        axis=0).reset_index(drop=True)
+
+    # Build file names that depend on SMALL_MULTIPLIER
+    csv_sample_path = ROOT / "data" / "processed" / f"sample_firms_m{SMALL_MULTIPLIER}.csv"
+    meta_path       = ROOT / "data" / "processed" / f"sample_meta_m{SMALL_MULTIPLIER}.csv"
+
+    # Writng the output to CSV
+    sample_df.to_csv(csv_sample_path, index=False)
+    print(f"[write] {csv_sample_path}  (rows={len(sample_df)}, "
+        f"Big={len(big_df)}, Small={len(small_df)})")
+
+    # Writing the output to CSV
+    meta = pd.DataFrame([{
+        "seed": SEED,
+        "big_override": BIG_OVERRIDE,
+        "small_multiplier": SMALL_MULTIPLIER,
+        "n_big": len(big_df),
+        "n_small": len(small_df),
+        "sample_len": SAMPLE_LEN,
+    }])
+    meta.to_csv(meta_path, index=False)
+    print(f"[write] {meta_path} (metadata for this sample)")
+
+    ### Download 1-year OHLCV and earnings data
+    # Download ^GSPC index. This block of code is from ChatGPT.
+    idx_hist = yf.Ticker(INDEX_TIC).history(SAMPLE_LEN)
+    if not idx_hist.empty:
+        (idx_hist.reset_index()
+                .rename(columns=str.title)
+                .to_csv(DIR_OHLCV / f"{INDEX_TIC}.csv", index=False))
+        print(f"[write] OHLCV: {INDEX_TIC}.csv ({len(idx_hist)})")
+    else:
+        print(f"[warn] Empty index data for {INDEX_TIC}")
+
+    # Download data for all selected firms. ChatGPT helped here a lot. Still couldn't
+    # figure out to check for existing data and skiping if correct information is 
+    # already available.
+    for tic in sample_df["ticker"]:
+        # checking if the data file already exist or not
+        price_path = DIR_OHLCV / f"{tic}.csv"
+        if price_path.exists():
+            print(f"[skip] OHLCV already exists for {tic}, skipping download.")
         else:
-            print(f"[warn] Skipping earnings for {tic}: no quarterly table available.")
-    except Exception as e:
-        print(f"[error] Earnings {tic}: {e}")
+            try:
+                prc = yf.Ticker(tic).history(SAMPLE_LEN)
+                if not prc.empty:
+                    (prc.reset_index()
+                        .rename(columns=str.title)
+                        .to_csv(price_path, index=False))
+                    print(f"[write] OHLCV: {tic}.csv ({len(prc)})")
+                else:
+                    print(f"[warn] Empty OHLCV for {tic}")
+            except Exception as e:
+                print(f"[error] OHLCV {tic}: {e}")
+
+        # Earning (quarterly with timestamp ONLY)
+        earn_path = DIR_EARN / f"{tic}.csv"
+
+        # Check if earnings already exist or not
+        if earn_path.exists():
+            print(f"[skip] Earnings already exists for {tic}, skipping download.")
+        else:
+            try:
+                tk = yf.Ticker(tic)
+                earn_q = tk.get_earnings_dates(limit=EARNINGS_LIMIT)
+
+                # If no valid quarterly table, skip
+                if not (isinstance(earn_q, pd.DataFrame) and not earn_q.empty):
+                    print(f"[warn] Skipping earnings for {tic}: no quarterly table available.")
+                else:
+                    earn_q = earn_q.reset_index()
+
+                    # Standardize earnings date column name
+                    if "index" in earn_q.columns:
+                        earn_q = earn_q.rename(columns={"index": "EarningsDate"})
+                    elif "Earnings Date" in earn_q.columns:
+                        earn_q = earn_q.rename(columns={"Earnings Date": "EarningsDate"})
+
+                    # Enforce timestamp and keep only needed columns
+                    if "EarningsDate" in earn_q.columns:
+                        earn_q["EarningsDate"] = pd.to_datetime(
+                            earn_q["EarningsDate"], errors="coerce"
+                        )
+                        earn_q = earn_q.dropna(subset=["EarningsDate"])
+
+                        keep = [
+                            c
+                            for c in [
+                                "EarningsDate",
+                                "EPS Estimate",
+                                "Reported EPS",
+                                "Surprise(%)",
+                                "Quarter",
+                            ]
+                            if c in earn_q.columns
+                        ]
+                        earn_q = earn_q[keep]
+
+                        if not earn_q.empty:
+                            earn_q.to_csv(earn_path, index=False)
+                            print(
+                                f"[write] Earnings (quarterly): {tic}.csv ({len(earn_q)})"
+                            )
+                        else:
+                            print(
+                                f"[warn] Skipping earnings for {tic}: "
+                                "required columns missing after cleaning."
+                            )
+                    else:
+                        print(
+                            f"[warn] Skipping earnings for {tic}: "
+                            "no timestamp column in get_earnings_dates()."
+                        )
+
+            except Exception as e:
+                print(f"[error] Earnings {tic}: {e}")
+
 
 # Script closing message
 print("[info] Step 3 complete.")
