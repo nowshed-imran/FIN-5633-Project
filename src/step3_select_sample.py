@@ -3,7 +3,7 @@
 
 """
 ==================================
-Project Update 2: Step 3
+Project Update 3
 Submitted by: Nowshed Imran
 Date: 10/25/2025
 ==================================
@@ -15,14 +15,26 @@ Goal of this script:
 1. Selects "Big" firms:
    - By default, includes ALL Big firms.
    - Optionally, user can limit how many Big firms to randomly pick.
-2. Calculates "Small" firm target:
-   - Small = SMALL_MULTIPLIER * number of Big firms (default = 3x).
-   - User can override SMALL_MULTIPLIER (up to 20, as each sector has minimum 20 companies).
-3. Picks Small firms "By Sector":
+2. Determines the target number of "Small" firms:
+   - target Small count = SMALL_MULTIPLIER * (number of selected Big firms).
+   - The script loops SMALL_MULTIPLIER from 1 up to MAX_MULTIPLIER (capped at 20),
+     so we obtain multiple sampling designs (m = 1, 2, ..., MAX_MULTIPLIER).
+3. Selects "Small" firms by sector (for each multiplier m):
    - Equal number (x) from each sector.
    - Remainder (y) from sectors that still have unused Small firms.
-4. Saves final list of firms to `data/processed/sample_firms.csv`.
-5. Downloads 1-year OHLCV prices and earnings dates for each firm + ^GSPC index.
+4. Saves sample membership for each multiplier:
+   - For each SMALL_MULTIPLIER = m, combines the selected Big and Small firms
+     into a single DataFrame with columns: ticker, w_latest, bucket, sector
+   - Writes:
+      data/processed/sample_firms_m{m}.csv  (firm-level sample)
+      data/processed/sample_meta_m{m}.csv   (metadata: seed, n_big, n_small, etc.)
+5. Downloads OHLCV price data (up to YEARS years) for ^GSPC and all sampled firms:
+   - Sample length is 20 years but it can be modified
+   - Based on each multiplier (m) OHLCV data gets downloaded
+   - Skip download if it is downloaded previously
+6. Downloads quarterly earnings dates and surprises (up to EARNINGS_LIMIT):
+   - Download earning information for each ticker upto 20 years
+   - Skip download if it is downloaded previously
 
 Limitations:
 I am not good enough coder to write this project. I have figured out the project
@@ -33,7 +45,6 @@ copied in mentioned in the comment.
 """
 
 # Importing statements and libraries
-import os
 import sys
 from pathlib import Path
 import numpy as np
@@ -73,7 +84,7 @@ DIR_EARN    = ROOT / "data" / "raw" / "earnings"
 INDEX_TIC = "^GSPC"            # S&P 500 Index
 YEARS = 20                     # 20 years of data to train model
 SAMPLE_LEN = f"{YEARS}y"       # To dowload S&P 500 Data
-SEED = 5633                    # Random seed for reproducibility
+SEED = 5621                    # Random seed for reproducibility
 
 ### User Override
 BIG_OVERRIDE = None             # Upto 14 is allowed
@@ -316,7 +327,6 @@ for SMALL_MULTIPLIER in range(1, MAX_MULTIPLIER + 1):
 
             except Exception as e:
                 print(f"[error] Earnings {tic}: {e}")
-
 
 # Script closing message
 print("[info] Step 3 complete.")

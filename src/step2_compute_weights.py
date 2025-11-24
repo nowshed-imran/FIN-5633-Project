@@ -3,7 +3,7 @@
 
 """
 ==================================
-Project Update 2: Step 2
+Project Update 2
 Submitted by: Nowshed Imran
 Date: 10/03/2025
 ==================================

@@ -1,27 +1,27 @@
 ticker,w_latest,bucket,sector
-NVDA,0.0746468478953716,Big,Information Technology
-AAPL,0.0687583310661064,Big,Information Technology
-MSFT,0.060142904669935,Big,Information Technology
-AMZN,0.0404364822260958,Big,Consumer Discretionary
-GOOGL,0.0298817978675046,Big,Communication Services
-GOOG,0.0277699362775606,Big,Communication Services
-AVGO,0.0275358250903455,Big,Information Technology
-TSLA,0.0222935676722638,Big,Consumer Discretionary
-META,0.0221824349701768,Big,Communication Services
-LLY,0.016256210073767,Big,Health Care
-WMT,0.014392251400457,Big,Consumer Staples
-JPM,0.0139052758882466,Big,Financials
-BRK-B,0.0118599504900002,Big,Financials
-T,0.0031507885699255,Small,Communication Services
-ROST,0.0009699270977807,Small,Consumer Discretionary
-STZ,0.0003987067632479,Small,Consumer Staples
-OXY,0.0006997662314847,Small,Energy
-BK,0.0012720920937605,Small,Financials
-CI,0.001273225903063,Small,Health Care
-IEX,0.0002189268641703,Small,Industrials
-GEN,0.0002805371891935,Small,Information Technology
-MLM,0.0006234762565221,Small,Materials
-VICI,0.0005279578767775,Small,Real Estate
-CEG,0.0018097577131138,Small,Utilities
-CHTR,0.0004502627080404,Small,Communication Services
-CMG,0.0007168465438842,Small,Consumer Discretionary
+NVDA,0.0746469993265118,Big,Information Technology
+AAPL,0.0687584705516007,Big,Information Technology
+MSFT,0.0601430266778816,Big,Information Technology
+AMZN,0.0404365642569221,Big,Consumer Discretionary
+GOOGL,0.0298818584867384,Big,Communication Services
+GOOG,0.0277699926126,Big,Communication Services
+AVGO,0.0275358809504589,Big,Information Technology
+TSLA,0.0222936128977552,Big,Consumer Discretionary
+META,0.0221824799702205,Big,Communication Services
+LLY,0.016256243051669,Big,Health Care
+WMT,0.0143922805970688,Big,Consumer Staples
+JPM,0.0139053040969633,Big,Financials
+BRK-B,0.0118599745495,Big,Financials
+T,0.0031507949617226,Small,Communication Services
+HLT,0.0010934971423087,Small,Consumer Discretionary
+KMB,0.0005982615909423,Small,Consumer Staples
+MPC,0.0009821235740849,Small,Energy
+TROW,0.0003752128695744,Small,Financials
+TMO,0.0037831077384299,Small,Health Care
+LII,0.0002796020445854,Small,Industrials
+PLTR,0.0060628375038041,Small,Information Technology
+ECL,0.0012965167724051,Small,Materials
+AVB,0.0004384932815464,Small,Real Estate
+AES,0.000167826898856,Small,Utilities
+NFLX,0.0075756981702924,Small,Communication Services
+NVR,0.0003460809693525,Small,Consumer Discretionary

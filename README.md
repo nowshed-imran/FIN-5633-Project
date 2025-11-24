@@ -34,13 +34,13 @@ Open terminal in the 'src' folder and run ipython. From ipython code can be
 run block by block maintaining script sequence. 
 
 ## Project Status
-| Stage  | Description                                            | Status     |
-| :----- | :----------------------------------------------------- | :----------|
-| Step 1 | Folder / file bootstrap                                | Complete   |
-| Step 2 | Market-cap weights generation                          | Complete   |
-| Step 3 | Sampling and data pull (OHLCV + earnings + index)      | Complete   |
-| Step 4 | Training Machine Learning model or Regression Analysis | To do      |
-| Step 5 | Testing the model with real data and test hypothesis   | To do      |
+| Stage  | Description                                         | Status     |
+| :----- | :---------------------------------------------------| :----------|
+| Step 1 | Folder / file bootstrap                             | Complete   |
+| Step 2 | Market-cap weights generation                       | Complete   |
+| Step 3 | Sampling and data pull (OHLCV + earnings + index)   | Complete   |
+| Step 4 | Logistic Regression Model Training                  | Complete   |
+| Step 5 | Measuring model prediction impact                   | To do      |
 
 ### Step 1: Bootstrap (`step1_bootstrap.py`)
 - Creates the project folder structure
@@ -82,7 +82,24 @@ run block by block maintaining script sequence.
   data/raw/earnings/
   ```
 
-
+### Step 4 — Logistic Regression (step4_logit.py)
+For each multiplier m:
+- Builds daily Big/Small earnings features:
+  - big_n, small_n
+  - big_weight, small_weight
+  - big_surprise, small_surprise
+- Creates index UP/DOWN label:
+  - y = 1 if return > 0 else 0
+- Merges earnings features + index data
+- Restricts to event days (big_n + small_n > 0)
+- Fits 3 models:
+  - overall
+  - big_only
+  - small_only
+- Performs 70/30 stratified train/test split
+- Stores results in:
+  - logit_index_summary.csv
+  - logit_index_accuracy.png
 
 
 
