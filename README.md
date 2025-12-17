@@ -40,7 +40,7 @@ run block by block maintaining script sequence.
 | Step 2 | Market-cap weights generation                       | Complete   |
 | Step 3 | Sampling and data pull (OHLCV + earnings + index)   | Complete   |
 | Step 4 | Logistic Regression Model Training                  | Complete   |
-| Step 5 | Measuring model prediction impact                   | To do      |
+| Step 5 | Measuring model prediction impact                   | Complete   |
 
 ### Step 1: Bootstrap (`step1_bootstrap.py`)
 - Creates the project folder structure
