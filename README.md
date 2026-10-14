@@ -47,7 +47,7 @@ and 2020 crises, and Big cutoffs of 0.5% and 2%, following Wooldridge's
 | `sp500_big_firm_earnings.py` | The full analysis in one script: download, sample, tests |
 | `Findings.docx` | Write-up with all tables and the figure |
 | `output/` | Results produced by the script |
-| `LICENSE` | GNU GPL v3 |
+| `LICENSE` | MIT |
 
 ## Data
 
