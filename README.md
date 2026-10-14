@@ -84,9 +84,10 @@ finish in seconds. Delete a file in `data/` to download it again.
 | File | Table or figure in `Findings.docx` |
 | :--- | :--- |
 | `output/h1_abs_return_by_day_type.csv` | Table 1 |
-| `output/h2_prediction_results.csv` | Table 2 |
-| `output/h3_beat_vs_miss_regression.csv` | Table 3 |
-| `output/extension_results.csv` | Tables 5 and 6 |
+| `output/h2_prediction_results.csv` | Table 3 |
+| `output/h3_beat_vs_miss_regression.csv` | First-pass H3 coefficients (Section 3.3) |
+| `output/extension_results.csv` | Tables 2 and 4 |
 | `output/results.png` | Figure 1 |
 
-Table 4 (H3 without 2008 and 2020) is printed to the console.
+The first-pass t-test and the H3 results without 2008 and 2020 are printed to the
+console.

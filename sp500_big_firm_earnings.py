@@ -425,29 +425,57 @@ results.to_csv("output/h2_prediction_results.csv", index=False)
 h3_table.to_csv("output/h3_beat_vs_miss_regression.csv")
 ext.to_csv("output/extension_results.csv", index=False)
 
-fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(16, 4.5))
+# Chart: how each estimate changes from the first pass to the corrected tests
 
-order = ["None", "Small only", "Big"]
-ax1.bar(order, h1.loc[order, "mean"], color=["grey", "tab:green", "tab:blue"])
-ax1.set_title(f"H1: Index move size (Big vs Small p = {p_val:.3f})")
-ax1.set_ylabel("Average absolute daily return (%)")
+
+def estimate_bars(ax, labels, estimates, t_values, title, ylabel):
+    """Bars with 95% confidence intervals (standard error = estimate / t)."""
+    se = [abs(e / t) for e, t in zip(estimates, t_values)]
+    ax.bar(labels, estimates, yerr=[1.96 * s for s in se], capsize=5,
+           color="tab:blue")
+    ax.axhline(0, color="black", linewidth=0.8)
+    ax.set_title(title)
+    ax.set_ylabel(ylabel)
+    ax.tick_params(axis="x", labelsize=8)
+
+
+def ext_row(test, spec, cutoff=BIG_CUTOFF):
+    """Estimate and t-statistic of one row of the extension table."""
+    row = ext[(ext["test"] == test) & (ext["spec"] == spec)
+              & (ext["cutoff"] == cutoff)].iloc[0]
+    return row["estimate"], row["t"]
+
+
+H1_TEST, H3_TEST = "H1: Big day effect on |return|", "H3: Big miss - Big beat"
+FULL = "HAC + VIX + year"
+
+h1_rows = [(big_days.mean() - small_days.mean(), t_stat),
+           ext_row(H1_TEST, "HAC"), ext_row(H1_TEST, FULL),
+           ext_row(H1_TEST, FULL, 0.005), ext_row(H1_TEST, FULL, 0.02)]
+h3_rows = [miss_minus_beat(h3)[:2], miss_minus_beat(h3_calm)[:2],
+           ext_row(H3_TEST, FULL),
+           ext_row("H3: Big miss - Big beat, normal years",
+                   "HAC + VIX + year + crisis")]
+
+fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(16, 4.8))
+
+estimate_bars(ax1, ["t-test", "Newey-West", "+ VIX\n+ year", "0.5%\ncutoff",
+                    "2%\ncutoff"],
+              [e for e, _ in h1_rows], [t for _, t in h1_rows],
+              "(a) H1: Big-day effect", "Extra absolute return (pp)")
 
 ax2.bar(results["model"], results["accuracy"], color="tab:blue")
 ax2.axhline(baseline_acc, color="black", linestyle="--",
             label=f"Always guess majority ({baseline_acc:.3f})")
-ax2.set_ylim(0.4, 0.65)
-ax2.set_title("H2: Out-of-sample direction accuracy")
+ax2.set_ylim(0.45, 0.60)
+ax2.set_title("(b) H2: Out-of-sample accuracy")
 ax2.set_ylabel("Accuracy")
-ax2.legend()
+ax2.legend(loc="upper left")
 
-# Slopes with 95% confidence intervals
-terms = ["big_pos", "big_neg", "small_pos", "small_neg"]
-labels = ["Big beat", "Big miss", "Small beat", "Small miss"]
-ax3.bar(labels, h3.params[terms], yerr=1.96 * h3.bse[terms], capsize=5,
-        color=["tab:blue", "tab:red", "tab:blue", "tab:red"])
-ax3.axhline(0, color="black", linewidth=0.8)
-ax3.set_title(f"H3: Miss vs beat (Big miss > beat p = {p_h3:.3f})")
-ax3.set_ylabel("Index return (%) per unit weighted surprise")
+estimate_bars(ax3, ["First pass", "Without\n2008, 2020", "Newey-West\n+ VIX + year",
+                    "Normal years\n(Chow)"],
+              [e for e, _ in h3_rows], [t for _, t in h3_rows],
+              "(c) H3: Big miss minus Big beat", "Difference in slopes")
 
 plt.tight_layout()
 plt.savefig("output/results.png", dpi=150)
