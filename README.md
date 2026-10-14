@@ -40,6 +40,14 @@ market conditions (previous-day VIX and year dummies), a Chow-style test for the
 and 2020 crises, and Big cutoffs of 0.5% and 2%, following Wooldridge's
 *Introductory Econometrics*.
 
+## AI assistance
+
+The study design, hypotheses, sample choices and interpretation are my own. The code
+was written with the help of Claude (Anthropic), which I used to rewrite my original
+course scripts into this single script, find and fix errors, and implement the
+econometric corrections. I have reviewed the code extensively and would appreciate
+any suggestions for improvement.
+
 ## Repository
 
 | File | Content |

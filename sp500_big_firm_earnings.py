@@ -22,6 +22,12 @@ The script does seven things:
      controls (yesterday's VIX, year dummies), a Chow-style crisis test and
      other Big cutoffs (Wooldridge, Introductory Econometrics, Ch. 7, 10, 12)
 
+AI assistance: The study design, hypotheses, sample choices and interpretation
+are my own. The code was written with the help of Claude (Anthropic), which I
+used to rewrite my original course scripts into this single script, find and
+fix errors, and implement the econometric corrections. I have reviewed the
+code extensively and would appreciate any suggestions for improvement.
+
 Before running, set PROJECT below to your project folder.
 Then run:  python sp500_big_firm_earnings.py
 """
