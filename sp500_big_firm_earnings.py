@@ -152,6 +152,7 @@ vix.index = vix.index.astype("datetime64[ns]")
 # Apply the fixed window, also to files saved by an earlier run
 prices = prices[(prices.index >= START) & (prices.index < END)]
 vix = vix[(vix.index >= START) & (vix.index < END)]
+print(prices[tickers].notna().any().sum(), "firms with price data in the window")
 
 
 # ---------------------------------------------------------------------------
