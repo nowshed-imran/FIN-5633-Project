@@ -1,0 +1,9 @@
+assumption,statistic,p
+Functional form (RESET),10.670075576455885,2.3764117750691892e-05
+Serial correlation: AR(1) rho,-0.07600215273264484,8.469511375089144e-08
+Serial correlation: Breusch-Godfrey (9 lags),138.92361739616504,1.7206866086556308e-25
+Serial correlation: Durbin-Watson,2.1508113409225253,
+Heteroskedasticity: Breusch-Pagan,895.115050317188,5.457223664419581e-166
+Heteroskedasticity: ARCH(1),313.0136976224919,4.816383061384542e-70
+Strict exogeneity: tomorrow's VIX,7.004369531026683,2.4810049466873917e-12
+Strict exogeneity: tomorrow's Big day,0.3923512065407935,0.6947987331149803

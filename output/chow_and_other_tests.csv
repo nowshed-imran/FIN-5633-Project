@@ -1,0 +1,9 @@
+item,estimate,p
+H1 big_day without controls (Newey-West),0.06058476729244129,0.29054501313321024
+H1 month dummies jointly zero (F test),,0.1916820774802086
+H1 big_day in normal years (Chow model),0.0997511443628512,0.0020596300925840023
+H1 extra big_day effect in 2008 and 2020,-0.2752331020299802,0.17763486276360996
+"H1 Chow test, both day-type effects change (joint p)",,0.30788317015689415
+H1 big_day without 2008 and 2020,0.09501197916944533,0.0022994308015631404
+"H2 Chow test, beat and miss slopes change (joint p)",,0.17536194935852795
+Prais-Winsten rho,-0.0759123220599138,
